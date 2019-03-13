@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.springproject.beans.StorageDAO">
+	<select id="storagelist_page" resultType="com.project.springproject.beans.StorageDTO">
+		<![CDATA[ SELECT item_code, item_category, item_name,item_cnt FROM v_item_storage_all_row WHERE rnum >= (#{param1}-1)*10+1 AND ROWNUM < 10+1 ]]>
+	</select>
+	<select id="storagelist_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_item_storage_all_row
+	</select>
+	
+	<insert id="storageadd" flushCache="true" parameterType="com.project.springproject.beans.StorageDTO">
+		insert into
+			item_storage
+		values
+			('${item_code}','${item_category}','${item_name}','${item_cnt}','${buy_money}','${sell_money}')
+	</insert>
+	
+	<select id="allstoragelist_page" resultType="com.project.springproject.beans.StorageDTO">
+		<![CDATA[ SELECT * FROM v_item_storage_all_row WHERE rnum >= (#{param1}-1)*10+1 AND ROWNUM < 10+1 ]]>
+	</select>
+	<select id="allstoragelist_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_item_storage_all_row
+	</select>
+	
+	<insert id ="allstorageadd" flushCache="true" parameterType="com.project.springproject.beans.StorageDTO">
+		insert into
+			item_storage
+		values
+			('${item_code}','${item_category}','${item_name}','${item_cnt}','${buy_money}','${sell_money}')
+	</insert>
+	<update id="storagemodify" flushCache="true" parameterType="com.project.springproject.beans.StorageDTO">
+		UPDATE item_storage 
+		SET item_category='${item_category}', item_name='${item_name}', item_cnt='${item_cnt}'
+		WHERE item_code= '${item_code}'
+	</update>
+	
+	<delete id ="storageremove" flushCache="true" parameterType="com.project.springproject.beans.StorageDTO">
+		DELETE FROM item_storage WHERE item_code = '${item_code}'
+	</delete>
+	
+	<update id ="allstoragemodify" parameterType="com.project.springproject.beans.StorageDTO">
+		UPDATE item_storage 
+		SET item_category='${item_category}', item_name='${item_name}', item_cnt='${item_cnt}', buy_money='${buy_money}', sell_money='${sell_money}'
+		WHERE item_code= '${item_code}'
+	</update>
+	
+	<delete id ="allstorageremove" flushCache="true" parameterType="com.project.springproject.beans.StorageDTO">
+		DELETE FROM item_storage WHERE item_code = '${item_code}'
+	</delete>
+	
+	<!-- 재고 코드으로 검색하기 -->
+	<select id="search_storagecode_page" resultType="com.project.springproject.beans.StorageDTO" parameterType="com.project.springproject.beans.StorageDTO">
+		<![CDATA[ 
+		SELECT t.item_code, t.item_category, t.item_name, t.item_cnt FROM 
+		(SELECT rownum rn, a.* FROM v_item_storage_all_row a WHERE item_code LIKE '%'||#{param1}||'%') t 
+		WHERE rn >= (#{param2}-1)*10+1 AND rownum < 10+1
+		]]>
+	</select>
+	<select id="search_storagecode_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_item_storage_all_row WHERE item_code like '%'||#{param1}||'%'
+	</select>
+	
+	<!-- 재고 카테고리로 검색하기 -->
+	<select id="search_storagecategory_page" resultType="com.project.springproject.beans.StorageDTO" parameterType="com.project.springproject.beans.StorageDTO">
+		<![CDATA[ 
+		SELECT t.item_code, t.item_category, t.item_name, t.item_cnt FROM 
+		(SELECT rownum rn, a.* FROM v_item_storage_all_row a WHERE item_category LIKE '%'||#{param1}||'%') t 
+		WHERE rn >= (#{param2}-1)*10+1 AND rownum < 10+1
+		]]>
+	</select>
+	<select id="search_storagecategory_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_item_storage_all_row WHERE item_category like '%'||#{param1}||'%'
+	</select>
+	
+	<select id="search_allstoragecode_page" resultType="com.project.springproject.beans.StorageDTO" parameterType="com.project.springproject.beans.StorageDTO">
+		<![CDATA[ 
+		SELECT t.* FROM 
+		(SELECT rownum rn, a.* FROM v_item_storage_all_row a WHERE item_code LIKE '%'||#{param1}||'%') t 
+		WHERE rn >= (#{param2}-1)*10+1 AND rownum < 10+1
+		]]>
+	</select>
+	<select id="search_allstoragecode_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_item_storage_all_row WHERE item_code like '%'||#{param1}||'%'
+	</select>
+	<select id="search_allstoragecategory_page" resultType="com.project.springproject.beans.StorageDTO" parameterType="com.project.springproject.beans.StorageDTO">
+		<![CDATA[ 
+		SELECT t.* FROM 
+		(SELECT rownum rn, a.* FROM v_item_storage_all_row a WHERE item_category LIKE '%'||#{param1}||'%') t 
+		WHERE rn >= (#{param2}-1)*10+1 AND rownum < 10+1
+		]]>
+	</select>
+	<select id="search_allstoragecategory_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_item_storage_all_row WHERE item_category like '%'||#{param1}||'%'
+	</select>
+	
+	<select id="search_item_code" resultType="com.project.springproject.beans.StorageDTO">
+		select 
+			item_code, item_name
+		from 
+			item_storage
+		where
+			item_code LIKE '%'||#{param1}||'%'
+	</select>
+</mapper>

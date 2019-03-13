@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.springproject.trans.beans.TransAndCashLogDAO">
+	<select id="findtranslog" resultType="Integer" parameterType="com.project.springproject.trans.beans.TransDTO" >
+		<!-- SELECT count(*) FROM trans_code WHERE busi_number = ${busi_number} AND trans_index = '${trans_index}' -->
+		SELECT 
+		(SELECT count(*) deletenum FROM DELETE_TRANS_CODE WHERE busi_number = ${busi_number} AND trans_index = '${trans_index}') + 
+		(SELECT count(*) total FROM TRANS_CODE WHERE busi_number = ${busi_number} AND trans_index = '${trans_index}') b
+		FROM dual
+	</select>
+	
+	<insert id="transcodeadd" parameterType="com.project.springproject.trans.beans.TransDTO" flushCache="true">
+		INSERT INTO trans_code 
+		VALUES('${trans_code}', '${trans_index}', '${busi_number}', '${busi_name}', ${trans_tmoney}, '${trans_subject}', to_date('${trans_date}', 'YYYY-MM-DD'), ${trans_san}, ${memidx}, '${name}', SYSDATE)
+	</insert>
+	
+	<insert id="transcashlogbuy" parameterType="com.project.springproject.trans.beans.TransCashLogDTO" flushCache="true">
+		INSERT INTO cash_log
+		VALUES('${trans_code}', '${item_code}', '${item_category}', '${item_name}', ${cash_cnt}, ${cash_money})
+	</insert>
+	
+	<select id="BuyTransList_page" resultType="com.project.springproject.trans.beans.TransDTO" parameterType="com.project.springproject.trans.beans.TransDTO">
+		<![CDATA[ SELECT * FROM v_trans_code_buy_all_row WHERE rnum >= (#{param2}-1)*10+1 AND ROWNUM < 10+1 ]]>
+	</select>
+	<select id="BuyTransList_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_trans_code_buy_all_row
+	</select>
+	
+	<select id="SelectByBuyTransList" resultType="com.project.springproject.trans.beans.TransDTO" parameterType="com.project.springproject.trans.beans.TransDTO">
+		SELECT * from trans_code WHERE trans_code = '${trans_code}'
+	</select>
+	
+	<select id="SelectByBuyTransCashLogList" resultType="com.project.springproject.trans.beans.TransCashLogDTO" parameterType="com.project.springproject.trans.beans.TransDTO">
+		SELECT * from cash_log WHERE trans_code = '${trans_code}'
+	</select>
+	
+	<select id="SellTransList_page" resultType="com.project.springproject.trans.beans.TransDTO" parameterType="com.project.springproject.trans.beans.TransDTO">
+		<![CDATA[ SELECT * FROM v_trans_code_sell_all_row WHERE rnum >= (#{param2}-1)*10+1 AND ROWNUM < 10+1 ]]>
+	</select>
+	<select id="SellTransList_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_trans_code_sell_all_row
+	</select>
+	
+	<select id="BackupList" resultType="com.project.springproject.trans.beans.TransDTO">
+		SELECT * FROM trans_code WHERE busi_number = #{param1}
+	</select>
+	
+	<insert id="TransCodeBackup" flushCache="true">
+		INSERT INTO delete_trans_code
+		SELECT * FROM trans_code
+		WHERE busi_number = #{param1}
+	</insert>
+	
+	<insert id="CashLogBackup" flushCache="true">
+		INSERT INTO delete_cash_log
+		SELECT * FROM cash_log
+		WHERE trans_code = #{param1}
+	</insert>
+	
+	<delete id="CashLogDelete" flushCache="true">
+		DELETE FROM cash_log WHERE trans_code = #{param1}
+	</delete>
+	<delete id="TransCodeDelete" flushCache="true">
+		DELETE FROM trans_code WHERE busi_number = #{param1}
+	</delete>
+	
+	<insert id="DetailCashLogBackup" parameterType="com.project.springproject.trans.beans.TransDTO" flushCache="true">
+		INSERT INTO DELETE_CASH_LOG SELECT * FROM CASH_LOG WHERE TRANS_CODE = '${trans_code}'
+	</insert>
+	<insert id="DetailTranscodeBackup" parameterType="com.project.springproject.trans.beans.TransDTO" flushCache="true">
+		INSERT INTO delete_trans_code SELECT * FROM TRANS_CODE WHERE TRANS_CODE = '${trans_code}'
+	</insert>
+	<delete id="DetailCashLogDelete" flushCache="true" parameterType="com.project.springproject.trans.beans.TransDTO">
+		DELETE FROM cash_log WHERE TRANS_CODE = '${trans_code}'
+	</delete>
+	<delete id="DetailTranscodeDelete" flushCache="true" parameterType="com.project.springproject.trans.beans.TransDTO">
+		DELETE FROM trans_code WHERE TRANS_CODE = '${trans_code}'
+	</delete>
+	
+	<update id="DetailTranscodeModify" flushCache="true" parameterType="com.project.springproject.trans.beans.TransDTO">
+		UPDATE trans_code set trans_subject = '${trans_subject}', trans_tmoney = '${trans_tmoney}' WHERE trans_code = '${trans_code}'
+	</update>
+	<insert id="DetailCashLogUpdate" flushCache="true" parameterType="com.project.springproject.trans.beans.TransCashLogDTO">
+		INSERT INTO cash_log
+		VALUES('${trans_code}', '${item_code}', '${item_category}', '${item_name}', ${cash_cnt}, ${cash_money})
+	</insert>
+	
+	<!-- 구매확인 안된것  가져오기-->
+	<select id="BuyUnconfirmTransList_page" resultType="com.project.springproject.trans.beans.TransDTO" parameterType="com.project.springproject.trans.beans.TransDTO">
+		<![CDATA[ SELECT * FROM v_trans_code_buy_unconfirm_row WHERE rnum >= (#{param2}-1)*10+1 AND ROWNUM < 10+1 ]]>
+	</select>
+	<select id="BuyUnconfirmTransList_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_trans_code_buy_unconfirm_row
+	</select>
+	
+	<!--  구매 확인 된것 가져오기 -->
+	<select id="BuyConfimTransList_page" resultType="com.project.springproject.trans.beans.TransDTO" parameterType="com.project.springproject.trans.beans.TransDTO">
+		<![CDATA[ SELECT * FROM v_trans_code_buy_confirm_row WHERE rnum >= (#{param2}-1)*10+1 AND ROWNUM < 10+1 ]]>
+	</select>
+	<select id="BuyConfimTransList_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_trans_code_buy_confirm_row
+	</select>
+	
+	<!-- 거래명으로 검색하기 -->
+	<select id="BuySearch_transsubject_page" resultType="com.project.springproject.trans.beans.TransDTO" parameterType="com.project.springproject.trans.beans.TransDTO">
+		<![CDATA[ 
+		SELECT t.* FROM 
+		(SELECT rownum rn, a.* FROM v_trans_code_buy_all_row a WHERE trans_subject LIKE '%'||#{param1}||'%') t 
+		WHERE rn >= (#{param2}-1)*10+1 AND rownum < 10+1
+		]]>
+	</select>
+	<select id="BuySearch_transsubject_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_trans_code_buy_all_row WHERE trans_subject LIKE '%'||#{param1}||'%'
+	</select>
+	
+	<!-- 거래번호로 검색하기 -->
+	<select id="BuySearch_transcode_page" resultType="com.project.springproject.trans.beans.TransDTO" parameterType="com.project.springproject.trans.beans.TransDTO">
+		<![CDATA[ 
+		SELECT t.* FROM 
+		(SELECT rownum rn, a.* FROM v_trans_code_buy_all_row a WHERE trans_code LIKE '%'||#{param1}||'%') t 
+		WHERE rn >= (#{param2}-1)*10+1 AND rownum < 10+1
+		]]>
+	</select>
+	<select id="BuySearch_transcode_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_trans_code_buy_all_row WHERE trans_code LIKE '%'||#{param1}||'%'
+	</select>
+	
+	
+	<!-- 판매 확인 안된것 가져오기 -->
+	<select id="SellUnconfirmTransList_page" resultType="com.project.springproject.trans.beans.TransDTO" parameterType="com.project.springproject.trans.beans.TransDTO">
+		<![CDATA[ SELECT * FROM v_trans_code_sell_uconfirm_row WHERE rnum >= (#{param2}-1)*10+1 AND ROWNUM < 10+1 ]]>
+	</select>
+	<select id="SellUnconfirmTransList_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_trans_code_sell_uconfirm_row
+	</select>
+	
+	<!-- 판매 확인 된것 가져오기 -->
+	<select id="SellConfirmTransList_page" resultType="com.project.springproject.trans.beans.TransDTO" parameterType="com.project.springproject.trans.beans.TransDTO">
+		<![CDATA[ SELECT * FROM v_trans_code_sell_confirm_row WHERE rnum >= (#{param2}-1)*10+1 AND ROWNUM < 10+1 ]]>
+	</select>
+	<select id="SellConfirmTransList_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_trans_code_sell_confirm_row
+	</select>
+	
+	<!-- 판매 거래명으로 검색하기 -->
+	<select id="SellSearch_transsubject_page" resultType="com.project.springproject.trans.beans.TransDTO" parameterType="com.project.springproject.trans.beans.TransDTO">
+		<![CDATA[ 
+		SELECT t.* FROM 
+		(SELECT rownum rn, a.* FROM v_trans_code_sell_all_row a WHERE trans_subject LIKE '%'||#{param1}||'%') t 
+		WHERE rn >= (#{param2}-1)*10+1 AND rownum < 10+1
+		]]>
+	</select>
+	<select id="SellSearch_transsubject_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_trans_code_sell_all_row WHERE trans_subject LIKE '%'||#{param1}||'%'
+	</select>
+	
+	<!-- 판매 거래번호로 검색하기 -->
+	<select id="SellSearch_trnascode_page" resultType="com.project.springproject.trans.beans.TransDTO" parameterType="com.project.springproject.trans.beans.TransDTO">
+		<![CDATA[ 
+		SELECT t.* FROM 
+		(SELECT rownum rn, a.* FROM v_trans_code_sell_all_row a WHERE trans_code LIKE '%'||#{param1}||'%') t 
+		WHERE rn >= (#{param2}-1)*10+1 AND rownum < 10+1
+		]]>
+	</select>
+	<select id="SellSearch_trnascode_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_trans_code_sell_all_row WHERE trans_code LIKE '%'||#{param1}||'%'
+	</select>
+	
+	<update id="TransSanChange" flushCache="true" parameterType="com.project.springproject.trans.beans.TransDTO">
+		UPDATE trans_code set trans_san = '1' WHERE trans_code = '${trans_code}'
+	</update>
+	
+	<select id="Delete_User_confirm" resultType="com.project.springproject.trans.beans.TransDTO">
+		SELECT * FROM trans_code WHERE trans_san = '0' AND memidx = #{param1}
+	</select>
+	
+	<!-- 메인화면 -->
+	<select id="unconfirm_list" resultType="com.project.springproject.trans.beans.TransDTO">
+		<![CDATA[ 
+		SELECT ROWNUM ro, M.* FROM
+		(SELECT ROWNUM rn, T.* FROM TRANS_CODE T WHERE trans_san = '0' AND memidx LIKE #{param1} ORDER BY TRANS_DATE DESC) M
+		WHERE rownum >= 1 AND rownum <= 7
+		]]>
+	</select>
+	<select id="confirm_list" resultType="com.project.springproject.trans.beans.TransDTO">
+		<![CDATA[ 
+		SELECT ROWNUM ro, M.* FROM
+		(SELECT ROWNUM rn, T.* FROM TRANS_CODE T WHERE trans_san = '1' ORDER BY TRANS_DATE DESC) M
+		WHERE rownum >= 1 AND rownum <= 7
+		]]>
+	</select>
+	
+	<select id="mainmonthtotal" resultType="Integer">
+		<![CDATA[ 
+			SELECT count(*) FROM TRANS_CODE WHERE TRANS_DATE >= TO_DATE(#{param1}, 'YYYY-MM') AND TRANS_DATE < TO_DATE(#{param2}, 'YYYY-MM')
+		]]>
+	</select>
+	<select id="mainbuytotal" resultType="Integer">
+		<![CDATA[ 
+			SELECT count(*) FROM TRANS_CODE WHERE TRANS_DATE >= TO_DATE(#{param1}, 'YYYY-MM') AND TRANS_DATE < TO_DATE(#{param2}, 'YYYY-MM') AND TRANS_INDEX ='구매' AND TRANS_SAN = '1'
+		]]>
+	</select>
+	<select id="mainselltotal" resultType="Integer">
+		<![CDATA[ 
+			SELECT count(*) FROM TRANS_CODE WHERE TRANS_DATE >= TO_DATE(#{param1}, 'YYYY-MM') AND TRANS_DATE < TO_DATE(#{param2}, 'YYYY-MM') AND TRANS_INDEX ='판매' AND TRANS_SAN = '1'
+		]]>
+	</select>
+	<select id="mainunconftotal" resultType="Integer">
+		<![CDATA[ 
+			SELECT count(*) FROM TRANS_CODE WHERE TRANS_DATE >= TO_DATE(#{param1}, 'YYYY-MM') AND TRANS_DATE < TO_DATE(#{param2}, 'YYYY-MM') AND TRANS_SAN = '0'
+		]]>
+	</select>
+	
+</mapper>

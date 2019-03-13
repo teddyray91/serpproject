@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.springproject.member.beans.MemberDAO">
+	<insert id="JoinCommit" flushCache="true" parameterType="com.project.springproject.member.beans.MemberDTO">
+		INSERT INTO co_member (memidx, grantidx, partidx, rankidx, id, pw, name, gender, phonenum, email, birthday, joindate) 
+		VALUES(memidx_seq.nextval, 0, ${partidx}, ${rankidx}, '${id}', '${pw}', '${name}', ${gender}, '${phonenum}', '${email}', to_date(substr('${birthday}',1,10), 'YYYY-MM-DD'), SYSDATE)
+	</insert>
+	<select id="login" resultType="com.project.springproject.member.beans.MemberLoginDTO">
+		SELECT memidx, id, name, email, part.partname part, rank.rankname rank, grantidx
+		FROM co_member mem
+		JOIN co_part part ON mem.partidx = part.partidx
+		JOIN co_rank rank ON mem.rankidx = rank.rankidx
+		WHERE id= #{param1} AND pw = #{param2}	
+	</select>
+	<select id="SelectByID" resultType="com.project.springproject.member.beans.MemberDTO">
+		SELECT memidx, grantidx, partidx, rankidx, id, name, gender, phonenum, email, birthday, joindate FROM co_member WHERE id = #{param1} AND email = #{param2}
+	</select>
+	<update id="oneUserModify" flushCache="true" parameterType="com.project.springproject.member.beans.MemberDTO">
+		UPDATE co_member SET pw='${pw}', email='${email}', phonenum='${phonenum}', birthday=to_date(substr('${birthday}',1,10), 'YYYY-MM-DD') WHERE memidx=${memidx}
+	</update>
+	<select id="selectID" parameterType="String" resultType="Integer">
+		SELECT COUNT(*) FROM co_member WHERE id = #{id}
+	</select>
+	
+	<select id="allSelectpaging" resultType="com.project.springproject.member.beans.MemberDTO">
+		<!-- SELECT ROWNUM, A.* from (select t.wr_id id, t.wr_subject subject, t.wr_name name, t.wr_regdate regDate, t.wr_viewCnt viewCnt, t.wr_content content from test_write t ORDER BY t.wr_id ASC) A, (SELECT count(*) total from test_write b) T WHERE ROWNUM &lt;= T.total-(#{param1}*5)+5 order by ROWNUM DESC -->
+		<![CDATA[ SELECT * FROM V_CO_MEMBER_ALL_ROW WHERE rnum >= (#{param2}-1)*10+1 AND ROWNUM < 10+1 AND memidx LIKE #{param1} ]]>
+	</select>
+	<select id="allSelecttotalpaging" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from V_CO_MEMBER_ALL_ROW
+	</select>
+	<select id="selectorbymember1_page" resultType="com.project.springproject.member.beans.MemberDTO">
+		<![CDATA[ SELECT * FROM V_CO_MEMBER_READY_ROW WHERE rnum >= (#{param1}-1)*10+1 AND ROWNUM < 10+1 ]]>
+	</select>
+	<select id="selectorbymember1_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from V_CO_MEMBER_READY_ROW
+	</select>
+	
+	<select id="selectorbymember2_page" resultType="com.project.springproject.member.beans.MemberDTO">
+		<![CDATA[ SELECT * FROM V_CO_MEMBER_ACCEPT_ROW WHERE rnum >= (#{param1}-1)*10+1 AND ROWNUM < 10+1 ]]>
+	</select>
+	<select id="selectorbymember2_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from V_CO_MEMBER_ACCEPT_ROW
+	</select>
+	
+	<!-- 회원 정보 수정 -->
+	<update id="selectempModify" flushCache="true" parameterType="com.project.springproject.member.beans.MemberDTO">
+		UPDATE co_member SET grantidx = ${grantidx}, partidx= ${partidx}, rankidx = ${rankidx}, id='${id}', pw='${pw}', name='${name}', email='${email}', phonenum='${phonenum}' WHERE memidx = ${memidx}
+	</update>
+		
+	<!--회원 정보 삭제 -->
+	<delete id="selectempDelete" flushCache="true" parameterType="com.project.springproject.member.beans.MemberDTO">
+		<!-- DELETE FROM co_member WHERE memidx = ${memidx} -->
+		UPDATE co_member SET grantidx = 6 WHERE memidx = ${memidx}
+	</delete> 
+	
+	<update id="MemberAccept" flushCache="true">
+		UPDATE co_member SET grantidx = '1' WHERE memidx = #{param1}
+	</update>
+	
+	<select id="partSelectList_page" resultType="com.project.springproject.member.beans.MemberDTO">
+		<![CDATA[ 
+		SELECT t.* FROM 
+		(SELECT rownum rn, a.* FROM V_CO_MEMBER_ALL_ROW a WHERE partidx LIKE '%'||#{param1}||'%') t 
+		WHERE rn >= (#{param2}-1)*10+1 AND rownum < 10+1
+		]]>
+	</select>
+	<select id="partSelectList_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from V_CO_MEMBER_ALL_ROW WHERE partidx LIKE '%'||#{param1}||'%'
+	</select>
+	<select id="rankSelectList_page" resultType="com.project.springproject.member.beans.MemberDTO">
+		<![CDATA[ 
+		SELECT t.* FROM 
+		(SELECT rownum rn, a.* FROM V_CO_MEMBER_ALL_ROW a WHERE rankidx LIKE '%'||#{param1}||'%') t 
+		WHERE rn >= (#{param2}-1)*10+1 AND rownum < 10+1
+		]]>
+	</select>
+	<select id="rankSelectList_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from V_CO_MEMBER_ALL_ROW WHERE rankidx LIKE '%'||#{param1}||'%'
+	</select>
+	<select id="nameSelectList_page" resultType="com.project.springproject.member.beans.MemberDTO">
+		<![CDATA[ 
+		SELECT t.* FROM 
+		(SELECT rownum rn, a.* FROM V_CO_MEMBER_ALL_ROW a WHERE name LIKE '%'||#{param1}||'%') t 
+		WHERE rn >= (#{param2}-1)*10+1 AND rownum < 10+1
+		]]>
+	</select>
+	<select id="nameSelectList_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from V_CO_MEMBER_ALL_ROW WHERE name LIKE '%'||#{param1}||'%'
+	</select>
+	
+	<!-- 아이디 비밀번호 찾기 서비스 -->
+	<select id="searchfindid" parameterType="com.project.springproject.member.beans.MemberDTO" resultType="com.project.springproject.member.beans.MemberDTO">
+		SELECT * FROM co_member WHERE name = '${name}' AND phonenum = '${phonenum}' AND email = '${email}'
+	</select>
+	<select id="searchfindpw" parameterType="com.project.springproject.member.beans.MemberDTO" resultType="com.project.springproject.member.beans.MemberDTO">
+		SELECT * FROM co_member WHERE id = '${id}' AND phonenum = '${phonenum}' AND email = '${email}'
+	</select>
+	
+	<select id="unconfmemberlist" resultType="com.project.springproject.member.beans.MemberDTO">
+		<![CDATA[ 
+		SELECT ROWNUM ro, M.* FROM
+		(SELECT ROWNUM rnum, T.memidx, P.PARTNAME partidx, R.RANKNAME rankidx, T.name, T.JOINDATE FROM CO_MEMBER T 
+		JOIN CO_PART P ON T.PARTIDX = P.PARTIDX
+		JOIN CO_RANK R ON T.RANKIDX = R.RANKIDX
+		WHERE grantidx = '0' ORDER BY JOINDATE DESC) M
+		WHERE rownum >= 1 AND rownum <= 7
+		]]>
+	</select>
+	
+	
+</mapper>

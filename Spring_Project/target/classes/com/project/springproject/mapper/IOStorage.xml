@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.springproject.beans.IOStorageDAO">
+	<insert id="IOStorageADD" flushCache="true" parameterType="com.project.springproject.trans.beans.TransDTO">
+		INSERT INTO INOUTSTORAGE (iostorageidx, trans_code, trans_index, busi_number, busi_name, trans_tmoney, trans_subject, trans_date, memidx, name, INOUT, run_date)
+		VALUES(iostorageidx_seq.nextval, '${trans_code}', '${trans_index}', '${busi_number}', '${busi_name}', '${trans_tmoney}', '${trans_subject}', '${trans_date}', '${memidx}', '${name}', '미확인', SYSDATE)
+	</insert>
+	
+	<select id="IOStorageListAll_page" resultType="com.project.springproject.beans.IOStorageDTO">
+		<![CDATA[ SELECT * FROM v_inoutstorage_all_row WHERE rnum >= (#{param1}-1)*10+1 AND ROWNUM < 10+1 ]]>
+	</select>
+	<select id="IOStorageListAll_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_inoutstorage_all_row
+	</select>
+	
+	<select id="IOStorageListIndex_page" resultType="com.project.springproject.beans.IOStorageDTO">
+		<![CDATA[ 
+		SELECT t.* FROM 
+		(SELECT rownum rn, a.* FROM v_inoutstorage_all_row a WHERE INOUT = #{param1} ) t 
+		WHERE rn >= (#{param2}-1)*10+1 AND rownum < 10+1
+		]]>
+	</select>
+	<select id="IOStorageListIndex_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_inoutstorage_all_row WHERE INOUT = #{param1}
+	</select>
+	
+	
+	<select id="IOStorageListsearchByTranscode_page" resultType="com.project.springproject.beans.IOStorageDTO">
+		<![CDATA[ 
+		SELECT t.* FROM 
+		(SELECT rownum rn, a.* FROM v_inoutstorage_all_row a WHERE trans_code LIKE '%'||#{param2}||'%' ) t 
+		WHERE rn >= (#{param3}-1)*10+1 AND rownum < 10+1
+		]]>
+	</select>
+	<select id="IOStorageListsearchByTranscode_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_inoutstorage_all_row WHERE trans_code LIKE '%'||#{param2}||'%'
+	</select>
+	<select id="IOStorageListsearchByBusiNumber_page" resultType="com.project.springproject.beans.IOStorageDTO">
+		<![CDATA[ 
+		SELECT t.* FROM 
+		(SELECT rownum rn, a.* FROM v_inoutstorage_all_row a WHERE busi_number LIKE '%'||#{param2}||'%' ) t 
+		WHERE rn >= (#{param3}-1)*10+1 AND rownum < 10+1
+		]]>
+	</select>
+	<select id="IOStorageListsearchByBusiNumber_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_inoutstorage_all_row WHERE busi_number LIKE '%'||#{param2}||'%'
+	</select>
+	<select id="IOStorageListsearchByBusiName_page" resultType="com.project.springproject.beans.IOStorageDTO">
+		<![CDATA[ 
+		SELECT t.* FROM 
+		(SELECT rownum rn, a.* FROM v_inoutstorage_all_row a WHERE busi_name LIKE '%'||#{param2}||'%' ) t 
+		WHERE rn >= (#{param3}-1)*10+1 AND rownum < 10+1
+		]]>
+	</select>
+	<select id="IOStorageListsearchByBusiName_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_inoutstorage_all_row WHERE busi_name LIKE '%'||#{param2}||'%'
+	</select>
+	<select id="IOStorageListsearchByName_page" resultType="com.project.springproject.beans.IOStorageDTO">
+		<![CDATA[ 
+		SELECT t.* FROM 
+		(SELECT rownum rn, a.* FROM v_inoutstorage_all_row a WHERE name LIKE '%'||#{param2}||'%' ) t 
+		WHERE rn >= (#{param3}-1)*10+1 AND rownum < 10+1
+		]]>
+	</select>
+	<select id="IOStorageListsearchByName_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_inoutstorage_all_row WHERE name LIKE '%'||#{param2}||'%'
+	</select>
+	
+	<update id="Updateinout" flushCache="true" parameterType="com.project.springproject.trans.beans.TransDTO">
+		UPDATE INOUTSTORAGE SET INOUT = #{param1}, run_date = SYSDATE WHERE trans_code = #{param2}
+	</update>
+	
+	<select id="Delete_User_IOStorage_confirm" resultType="com.project.springproject.beans.IOStorageDTO">
+		SELECT * FROM INOUTSTORAGE WHERE inout = '미확인' AND memidx = #{param1}
+	</select>
+	
+	<select id="unconfirmlist" resultType="com.project.springproject.beans.IOStorageDTO">
+		<![CDATA[
+		SELECT ROWNUM ro, M.* FROM
+		(SELECT ROWNUM rn, T.* FROM INOUTSTORAGE T WHERE INOUT = '미확인' ORDER BY RUN_DATE DESC) M
+		WHERE rownum >= 1 AND rownum <= 7;
+		]]>
+	</select>
+	
+</mapper>

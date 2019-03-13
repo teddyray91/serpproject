@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.springproject.business.beans.BusiDAO">
+	<insert id="transadd" flushCache="true" parameterType="com.project.springproject.business.beans.BusiDTO">
+		INSERT INTO busi_infomation 
+		VALUES('${busi_number}', '${busi_name}', '${busi_address}', '${busi_phone}', '${busi_owner}', '${busi_index}')
+	</insert>
+	
+	<select id="translist_page" resultType="com.project.springproject.business.beans.BusiDTO">
+		<![CDATA[ SELECT * FROM V_busi_infomation_ROW WHERE rnum >= (#{param1}-1)*10+1 AND ROWNUM < 10+1 ]]>
+	</select>
+	<select id="translist_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from V_busi_infomation_ROW
+	</select>
+	
+	
+	<select id="transselect" resultType="com.project.springproject.business.beans.BusiDTO" parameterType="com.project.springproject.business.beans.BusiDTO">
+		SELECT * FROM busi_infomation WHERE busi_number = '${busi_number}'
+	</select>
+	
+	<select id="translikeselect" resultType="com.project.springproject.business.beans.BusiDTO" >
+		SELECT * FROM busi_infomation WHERE busi_number like '%'||#{param1}||'%'
+	</select>
+
+	<update id="transmodify" flushCache="true" parameterType="com.project.springproject.business.beans.BusiDTO">
+		UPDATE busi_infomation 
+		SET busi_name='${busi_name}', busi_address='${busi_address}', busi_phone='${busi_phone}', busi_owner='${busi_owner}', busi_index='${busi_index}' 
+		WHERE busi_number= '${busi_number}'
+	</update>
+
+	<insert id="transbackup" flushCache="true">
+		INSERT INTO delete_busi_infomation
+		SELECT * from busi_infomation
+		WHERE busi_number = #{param1}
+	</insert>
+
+	<delete id="BusiDelete" flushCache="true">
+		DELETE FROM busi_infomation WHERE busi_number = #{param1}
+	</delete>
+	
+	
+	<select id="transselectfarmlist_page" resultType="com.project.springproject.business.beans.BusiDTO" parameterType="com.project.springproject.business.beans.BusiDTO">
+		<![CDATA[ SELECT * FROM v_busi_infomation_farm_row WHERE rnum >= (#{param2}-1)*10+1 AND ROWNUM < 10+1 ]]>
+	</select>
+	<select id="transselectfarmlist_totalpage" resultType="Integer" parameterType="com.project.springproject.business.beans.BusiDTO">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from v_busi_infomation_farm_row
+	</select>
+	<select id="transselectmartlist_page" resultType="com.project.springproject.business.beans.BusiDTO" parameterType="com.project.springproject.business.beans.BusiDTO">
+		<![CDATA[ SELECT * FROM V_busi_infomation_mart_ROW WHERE rnum >= (#{param2}-1)*10+1 AND ROWNUM < 10+1 ]]>
+	</select>
+	<select id="transselectmartlist_totalpage" resultType="Integer" parameterType="com.project.springproject.business.beans.BusiDTO">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from V_busi_infomation_mart_ROW
+	</select>
+	
+
+	<!-- 검색 (사업자번호, 사업장명, 대표자 -->
+	<select id="transselect_businumber_page" resultType="com.project.springproject.business.beans.BusiDTO">
+		<![CDATA[ 
+		SELECT t.* FROM 
+		(SELECT rownum rn, a.* FROM V_busi_infomation_ROW a WHERE busi_number LIKE '%'||#{param1}||'%') t 
+		WHERE rn >= (#{param2}-1)*10+1 AND rownum < 10+1
+		]]>
+	</select>
+	<select id="transselect_businumber_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from V_busi_infomation_ROW WHERE busi_number like '%'||#{param1}||'%'
+	</select>
+	<select id="transselect_businame_page" resultType="com.project.springproject.business.beans.BusiDTO">
+		<![CDATA[ 
+		SELECT t.* FROM 
+		(SELECT rownum rn, a.* FROM V_busi_infomation_ROW a WHERE busi_name LIKE '%'||#{param1}||'%') t 
+		WHERE rn >= (#{param2}-1)*10+1 AND rownum < 10+1
+		]]>
+	</select>
+	<select id="transselect_businame_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from V_busi_infomation_ROW WHERE busi_name like '%'||#{param1}||'%'
+	</select>
+	
+	<select id="transselect_busiowner_page" resultType="com.project.springproject.business.beans.BusiDTO">
+		<![CDATA[ 
+		SELECT t.* FROM 
+		(SELECT rownum rn, a.* FROM V_busi_infomation_ROW a WHERE busi_owner LIKE '%'||#{param1}||'%') t 
+		WHERE rn >= (#{param2}-1)*10+1 AND rownum < 10+1
+		]]>
+	</select>
+	<select id="transselect_busiowner_totalpage" resultType="Integer">
+		SELECT TRUNC(count(*)/10 + 0.9, 0) from V_busi_infomation_ROW WHERE busi_owner like '%'||#{param1}||'%'
+	</select>
+</mapper>

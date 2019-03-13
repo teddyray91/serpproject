@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
+	
+	<!-- Enables the Spring MVC @Controller programming model -->
+	<annotation-driven />
+
+	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
+	<resources mapping="/resources/**" location="/resources/" />
+
+	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
+	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+	</beans:bean>
+	
+	<context:component-scan base-package="com.project.springproject" />
+	
+	
+	<!-- DB 연결 정보 작성 -->
+	<beans:bean name="datasource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<beans:property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+		<beans:property name="url" value="jdbc:oracle:thin:@localhost:1521:XE"/>
+		<beans:property name="username" value="spring"/>
+		<beans:property name="password" value="spring"/>
+	</beans:bean>
+	<!-- SQL Session Mapper 설정 -->
+	<beans:bean name ="SqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<beans:property name="dataSource" ref="datasource"/>
+		<beans:property name="mapperLocations" value="classpath:/com/project/springproject/mapper/*.xml"/>
+	</beans:bean>
+	<!-- Session 생성 -->
+	<beans:bean name="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<beans:constructor-arg index="0" ref="SqlSessionFactory" />
+	</beans:bean>
+	
+	<!-- Interceptor Bean Create -->
+	<beans:bean name="MemberLoginInterceptor" class="com.project.springproject.interceptor.MemberLoginInterceptor"/>
+	
+	<interceptors>
+		<interceptor>
+			<mapping path="/home/*" />
+			<mapping path="/html/*" />
+			<mapping path="/html/home/*" />
+			<mapping path="/allstorage/*" />
+			<mapping path="/storageitem/*" />
+			<mapping path="/storage/*" />
+			<mapping path="/iostorage/*" />
+			<mapping path="/iostorage/search/*" />
+			<mapping path="/iostorage/main/*" />
+			<mapping path="/member/*" />
+			<mapping path="/member/select/*" />
+			<mapping path="/member/search/*" />
+			<mapping path="/member/main/*" />
+			<mapping path="/trans/*" />
+			<mapping path="/company/*" />
+			<mapping path="/transitem/*" />
+			<mapping path="/transitem/buy/*" />
+			<mapping path="/transitem/sell/*" />
+			<mapping path="/transitem/modify/*" />
+			<mapping path="/transitem/main/*" />
+			
+			<mapping path="/home" />
+			<mapping path="/admin" />
+			<mapping path="/html" />
+			<mapping path="/allstorage" />
+			<mapping path="/storageitem" />
+			<mapping path="/storage" />
+			<mapping path="/iostorage" />
+			<mapping path="/member" />
+			<mapping path="/trans" />
+			<mapping path="/company" />
+			<mapping path="/transitem" />
+			
+			<exclude-mapping path="/member/findid"/>
+			<exclude-mapping path="/member/findpw"/>
+			<exclude-mapping path="/member/joincommit"/>
+			<exclude-mapping path="/member/selectid"/>
+			<exclude-mapping path="/member/join"/>
+			<beans:ref bean="MemberLoginInterceptor"/>
+		</interceptor>
+	</interceptors>
+	
+</beans:beans>

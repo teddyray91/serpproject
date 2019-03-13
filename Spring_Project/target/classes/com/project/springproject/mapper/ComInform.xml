@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.springproject.beans.ComInformDAO">
+	<select id="cominformlist" resultType="com.project.springproject.beans.ComInformDTO">
+		<!-- SELECT * FROM com_inform -->
+		SELECT a.*, b.comemp, c.comtran FROM COM_INFORM a, (SELECT count(*) comemp FROM CO_MEMBER) b, (SELECT count(*) comtran FROM BUSI_INFOMATION) c
+	</select>
+	
+	<insert id="cominformadd" parameterType="com.project.springproject.beans.ComInformDTO" flushCache="true">
+		INSERT INTO com_inform VALUES('${comnumber}','${comname}','${comowner}',to_date('${comdate}','YYYY-MM-DD'),'${commoney}','${comtel}','${comfax}','${comemail}','${comloc}')
+	</insert>
+	
+	<update id="comInformModify" flushCache="true" parameterType="com.project.springproject.beans.ComInformDTO">
+	UPDATE com_inform SET comowner='${comowner}', commoney='${commoney}',comtel='${comtel}',comfax='${comfax}',comemail='${comemail}',comloc='${comloc}' WHERE comnumber = '${comnumber}'
+	</update>
+	
+	<update id="ComMoneyChange" flushCache="true">
+		UPDATE com_inform SET commoney = #{param1} WHERE comnumber = #{param2}
+	</update>
+	
+</mapper>
