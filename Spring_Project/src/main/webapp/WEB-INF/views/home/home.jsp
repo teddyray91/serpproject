@@ -4,7 +4,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>team00 Project HOME</title>
+<title>team1 Project HOME</title>
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/resources/jquery-ui/jquery-ui.min.css">
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/resources/fontawesome/css/all.css">
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/resources/bootstrap-3.3.2/css/bootstrap.css">
