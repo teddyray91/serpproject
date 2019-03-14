@@ -202,7 +202,7 @@ table i.search_item_code{
 	margin: auto;
 	text-align: center;
 	font-family: arial;
-	z-index: 1px;
+	z-index: 99;
 	background-color:black;
 	position: absolute;
 	top: 40px;
